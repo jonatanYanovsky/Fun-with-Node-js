@@ -4,6 +4,7 @@
 
 var http = require('http');
 var sqlite3 = require('sqlite3');
+var fs = require('fs');
 
 var db = new sqlite3.Database('myDatabase.db');
 
@@ -15,18 +16,29 @@ http.createServer(function (req, res) { // async
     if (req.url === '/favicon.ico') {
         res.writeHead(200, { 'Content-Type': 'image/x-icon' });
         res.end();
-        console.log('favicon requested');
+        //console.log('favicon requested');
         return;
     }
 
-    // create a text element in the website
-    res.writeHead(200, { 'Content-Type': 'text/plain' });
-
-    // async
-    getCurrentVisitor(function (visitorNum) { // display current visitor number
-        res.end(welcomeText + visitorNum + '!');
+	// send our html to client
+	fs.readFile('website.html', function(err, data) {
+		
+		res.writeHead(200, { 'Content-Type': 'text/html' });
+		res.write(data);
+		
+		// async
+		getCurrentVisitor(function (visitorNum) { // display current visitor number
+			// create a text element in the website
+			
+			res.write('<br><p>----------------------------</p>');
+			res.write('<p><b>' + welcomeText + visitorNum + '!</b></p>');
+			res.end();
+		});
+		
     });
 
+
+	
 }).listen(8080);
 
 
