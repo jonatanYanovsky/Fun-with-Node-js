@@ -5,12 +5,13 @@
 var http = require('http');
 var sqlite3 = require('sqlite3');
 var fs = require('fs');
+var url = require('url');
 
 var db = new sqlite3.Database('myDatabase.db');
 
 var welcomeText = 'Welcome Visitor #';
 
-http.createServer(function (req, res) { // async
+/*http.createServer(function (req, res) { // async
 
     // eliminate double connections
     if (req.url === '/favicon.ico') {
@@ -21,23 +22,46 @@ http.createServer(function (req, res) { // async
     }
 
 	// send our html to client
+	// FOR DEVELOPMENT ONLY
 	fs.readFile('website.html', function(err, data) {
 		
 		res.writeHead(200, { 'Content-Type': 'text/html' });
 		res.write(data);
 		
 		// async
-		getCurrentVisitor(function (visitorNum) { // display current visitor number
+		/*getCurrentVisitor(function (visitorNum) { // display current visitor number
 			// create a text element in the website
 			
-			res.write('<br><p>----------------------------</p>');
-			res.write('<p><b>' + welcomeText + visitorNum + '!</b></p>');
+			//res.write('<br><p>----------------------------</p>');
+			//res.write('<p><b>' + welcomeText + visitorNum + '!</b></p>');
 			res.end();
-		});
-		
+		});*/
+		/*
     });
+}).listen(8080);*/
 
 
+
+http.createServer(function (request, response) {
+	// https://stackoverflow.com/questions/6011984/basic-ajax-send-receive-with-node-js
+	// https://www.w3schools.com/xml/ajax_xmlhttprequest_send.asp
+	
+	var path = url.parse(request.url).pathname;
+	if (path == "/getTicker") {
+		console.log("recieved request")
+		getCurrentVisitor(function (visitorNum) { // display current visitor number
+
+			response.writeHead(200, {
+				'Content-Type': 'text/plain', 
+				'Access-Control-Allow-Origin' : '*',
+				'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE'
+				}); // enable cors
+				
+			response.end("" + visitorNum);
+			
+			console.log("sent response " + visitorNum);
+		});
+	}
 	
 }).listen(8080);
 

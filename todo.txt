@@ -1,0 +1,9 @@
+use css to style the front end
+use express (Node.js framework)
+
+done:
+get client to accept AJAX response
+use javascript to contact our Node.js server through AJAX
+use javascript to modify html 
+html front end
+use Node.js to modify database
