@@ -1,7 +1,11 @@
+todo: top (highest priority) to bottom (less immediately important)
+implement noSQL database for ticker count
+replace SQL implementation with noSQL
 use css to style the front end
-use express (Node.js framework)
+determine uses of express (Node.js framework)
 
-done:
+
+done (top is newest done):
 get client to accept AJAX response
 use javascript to contact our Node.js server through AJAX
 use javascript to modify html 
