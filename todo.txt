@@ -1,11 +1,14 @@
 todo: top (highest priority) to bottom (less immediately important)
-implement noSQL database for ticker count
-replace SQL implementation with noSQL
+create comment upload form
+rename project (come up with project name)
+separate files for css, JS, and html
+implement noSQL database (if applicable)
 use css to style the front end
 determine uses of express (Node.js framework)
 
 
 done (top is newest done):
+create comment display
 get client to accept AJAX response
 use javascript to contact our Node.js server through AJAX
 use javascript to modify html 

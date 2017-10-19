@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 
 <head>
-	<title>My Title</title>
+	<title>Welcome to the internet</title>
 	<link rel="icon" type="image/jpeg" href="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e2/Complex_sqrt_leaf1.jpg/200px-Complex_sqrt_leaf1.jpg"/>
 
 	<style>
@@ -55,9 +55,29 @@
 		document.getElementById("ticker").innerHTML = welcomeText + visitorCount + "!";
 	}
 	
-	function server() { // contacts server, requests ticker count
+	function printMessages(xhttp) { // a callback from server()
+		var commentsInHTML = "" + xhttp.responseText;
+		
+		// our reply from server is a JSON string that includes our
+		// {visitorNum, comment} object. We need to parse that to get the
+		// original object. 
+		var commentObject = JSON.parse(commentsInHTML);
+		
+		var myElement = document.getElementById("messageQueue");
+		
+		for (var i = 0; i < commentObject.length; i++) {
+			
+			// https://stackoverflow.com/questions/16595483/how-do-you-add-a-line-break-inside-of-a-javascript-variable-using-kineticjs
+			
+			myElement.innerHTML = myElement.innerHTML + "<br /> Visitor number " + commentObject[i].visitorNum + " says: " + commentObject[i].comment;
+		}
+				
+	}
+	
+	function server() { // contacts server, requests ticker count and comments
 	
 		var xhttp = new XMLHttpRequest();
+		var comments = new XMLHttpRequest();
 		
 		xhttp.onreadystatechange = function() {
 			if (this.readyState == 4 && this.status == 200) {
@@ -65,8 +85,18 @@
 				}
 		};
 		
+		comments.onreadystatechange = function() {
+			if (this.readyState == 4 && this.status == 200) {
+				printMessages(this);
+				}
+		};
+		
 		xhttp.open("GET", "http://localhost:8080/getTicker", true);
 		xhttp.send();
+		
+		comments.open("GET", "http://localhost:8080/getComments", true);
+		comments.send();
+		
 	}	
 	
 	// 1. implements a fancy mouseover effect
@@ -92,9 +122,9 @@
 	<p class="round1" onmouseover="borderOver(this)" onmouseout="borderOut(this)">Sign Up</p>
 	<h3>Thank <i>You!</i></h3>
 	
-	<p>Have a <br> 
-	<b>line break</b> 
-	<br>today! </p>
+	<!-- post comments upload box here -->
+	
+	<p id="messageQueue">Comments</p><!-- display user comments -->
 	
 	<!-- 3. implements a fancy mouseover effect-->
 	<p>Where I pulled this from:</p>

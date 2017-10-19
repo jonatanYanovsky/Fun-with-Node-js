@@ -1,5 +1,6 @@
-# Fun-with-Node-js
-Proof that I know Node.js and SQLite
+# Fun-with-Node-js --> to be renamed and pushed to a new project
+
+
 
 
 To run website:
