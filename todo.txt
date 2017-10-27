@@ -1,5 +1,5 @@
 todo: top (highest priority) to bottom (less immediately important)
-create comment upload form
+reload comments after user has uploaded their comment
 rename project (come up with project name)
 separate files for css, JS, and html
 implement noSQL database (if applicable)
@@ -8,6 +8,7 @@ determine uses of express (Node.js framework)
 
 
 done (top is newest done):
+create comment upload form
 create comment display
 get client to accept AJAX response
 use javascript to contact our Node.js server through AJAX

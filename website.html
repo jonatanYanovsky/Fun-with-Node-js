@@ -48,7 +48,46 @@
 	var welcomeText = "Welcome Visitor #";
 	var visitorCount = 0;
 	
+	var hasLoadedTicker = false;
+	
 	var element;
+	
+	//var submitCommentButton;
+
+	
+	// https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/button
+	//https://stackoverflow.com/questions/26107125/cannot-read-property-addeventlistener-of-null
+	document.addEventListener('DOMContentLoaded', function () {
+		//e.preventDefault();
+		submitCommentButton = document.getElementById("submitComment");	
+		submitCommentButton.addEventListener("click", sendCommentToServer);
+	}); 
+	
+	
+	
+	/*document.getElementById('commentForm').addEventListener('submit', function(e) {
+		alert("submitted");
+		e.preventDefault();
+		sendCommentToServer();
+		//submitCommentButton = document.getElementById("submitComment");	
+		//submitCommentButton.addEventListener("click", sendCommentToServer);
+		
+	}, false);*/
+
+	
+	function sendCommentToServer() {
+		var commentString = document.getElementById("commentUpload").value;
+		if (commentString != null) {
+			var xhttp = new XMLHttpRequest();
+				
+			xhttp.open("POST", "http://localhost:8080/newComment", true);
+			xhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+			xhttp.send("val=" + commentString);
+			//alert("val=" + commentString); // to test if sent
+			
+			server();
+		}
+	}
 	
 	function setTickerCount(xhttp) { // a callback from server()
 		visitorCount = "" + xhttp.responseText;
@@ -65,6 +104,8 @@
 		
 		var myElement = document.getElementById("messageQueue");
 		
+		myElement.innerHTML = "";
+		
 		for (var i = 0; i < commentObject.length; i++) {
 			
 			// https://stackoverflow.com/questions/16595483/how-do-you-add-a-line-break-inside-of-a-javascript-variable-using-kineticjs
@@ -76,28 +117,33 @@
 	
 	function server() { // contacts server, requests ticker count and comments
 	
+		// https://www.w3schools.com/xml/ajax_xmlhttprequest_send.asp
+	
 		var xhttp = new XMLHttpRequest();
 		var comments = new XMLHttpRequest();
 		
-		xhttp.onreadystatechange = function() {
-			if (this.readyState == 4 && this.status == 200) {
-				setTickerCount(this);
-				}
-		};
+		if (hasLoadedTicker == false) { // only load ticker once per page load
+		
+			xhttp.onreadystatechange = function() {
+				if (this.readyState == 4 && this.status == 200) setTickerCount(this);
+			};
+			
+			xhttp.open("GET", "http://localhost:8080/getTicker", true);
+			xhttp.send();
+			
+			hasLoadedTicker = true;
+		}
 		
 		comments.onreadystatechange = function() {
-			if (this.readyState == 4 && this.status == 200) {
-				printMessages(this);
-				}
+			if (this.readyState == 4 && this.status == 200) printMessages(this);
 		};
-		
-		xhttp.open("GET", "http://localhost:8080/getTicker", true);
-		xhttp.send();
 		
 		comments.open("GET", "http://localhost:8080/getComments", true);
 		comments.send();
 		
 	}	
+	
+	// TODO: one function that can be set with a toggle:
 	
 	// 1. implements a fancy mouseover effect
 	function borderOver(element) {
@@ -117,12 +163,21 @@
 	<h1 class="blue">A Social Network!!!!</h1>
 	<p class="red tiny">It's free!</p>
 	<br>
+	<!-- remove the onmouseover, add a script instead -->
 	<p class="round1" onmouseover="borderOver(this)" onmouseout="borderOut(this)">Login</p>
 	<br>
 	<p class="round1" onmouseover="borderOver(this)" onmouseout="borderOut(this)">Sign Up</p>
 	<h3>Thank <i>You!</i></h3>
 	
-	<!-- post comments upload box here -->
+	<!-- comments upload box https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/text -->
+	<form id="commentForm" onSubmit="return false;">
+	<div>
+	<label for="commentUpload">Got something to say? </label>
+	<input id="commentUpload" type="text" placeholder="50 Characters Max" 
+	name="name" maxlength="50">
+	<input id="submitComment" type="submit" value="submit">
+	</div>
+	</form>
 	
 	<p id="messageQueue">Comments</p><!-- display user comments -->
 	

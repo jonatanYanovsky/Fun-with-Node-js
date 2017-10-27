@@ -6,10 +6,13 @@ var http = require('http');
 var sqlite3 = require('sqlite3');
 var fs = require('fs');
 var url = require('url');
+var parseBody = require('parse-body');
 
 var db = new sqlite3.Database('myDatabase.db');
 
 var welcomeText = 'Welcome Visitor #';
+
+var lastVisitorNumber;
 
 http.createServer(function (request, response) {
 	// https://stackoverflow.com/questions/6011984/basic-ajax-send-receive-with-node-js
@@ -18,6 +21,10 @@ http.createServer(function (request, response) {
 	
 	var path = url.parse(request.url).pathname;
 	
+	// https://stackoverflow.com/questions/46966725/node-js-url-search-query-portion-is-empty
+	//const { headers, method, url } = request;
+	
+  
 	if (path == "/getTicker") {
 		console.log("recieved request")
 		getCurrentVisitor(function (visitorNum) { // display current visitor number
@@ -53,6 +60,41 @@ http.createServer(function (request, response) {
 
 		});
 	}
+	else if (path == "/newComment") {
+		// https://www.w3schools.com/nodejs/nodejs_http.asp
+		
+		
+		/*let body = [];
+		request.on('error', (err) => { console.error(err); 
+			}).on('data', (chunk) => { 
+			body.push(chunk);
+			}).on('end', () => { 
+			body = Buffer.concat(body).toString(); 
+			console.log(body);
+			
+
+			//var comment = 
+			//if (body != null) setNewComment(comment);
+		});*/
+		
+		// https://www.npmjs.com/package/parse-body
+		parseBody(request, 1e6, function(err, comment) {
+			if (err) return console.log(err);
+			if (comment.val != null) 
+				setNewComment(comment.val);
+			//console.log(comment.val);
+		});
+		
+		// send a response to calm down the client https://stackoverflow.com/questions/16285035/simple-ajax-get-request-is-pending
+		response.writeHead(200, {
+			'Content-Type': 'text/plain', 
+			'Access-Control-Allow-Origin' : '*',
+			'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE'
+			}); // enable cors
+		response.write("Recieved request");
+		response.end();
+		
+	}
 	
 }).listen(8080);
 
@@ -63,7 +105,7 @@ function getCurrentVisitor(callback) {
         if (err) throw err;
 
         // THIS user is the (lastVisitorNumber+1) viewer of the website
-        var lastVisitorNumber = row.visitorNum; 
+        lastVisitorNumber = row.visitorNum; 
         lastVisitorNumber++;
 
         // prep sql
@@ -95,31 +137,19 @@ function getComments(callback) { // return comments
 }
 
 
-/*http.createServer(function (req, res) { // async
+function setNewComment(comment) {
 
-    // eliminate double connections
-    if (req.url === '/favicon.ico') {
-        res.writeHead(200, { 'Content-Type': 'image/x-icon' });
-        res.end();
-        //console.log('favicon requested');
-        return;
-    }
+	// prep sql
+	if (lastVisitorNumber != null && lastVisitorNumber != undefined) {
+		
+		// https://stackoverflow.com/questions/39805003/sqlite-error-no-such-column
+		var sql = 'INSERT INTO comments VALUES (\'' + lastVisitorNumber + '\', \'' + comment + '\')';
 
-	// send our html to client
-	// FOR DEVELOPMENT ONLY
-	fs.readFile('website.html', function(err, data) {
-		
-		res.writeHead(200, { 'Content-Type': 'text/html' });
-		res.write(data);
-		
 		// async
-		/*getCurrentVisitor(function (visitorNum) { // display current visitor number
-			// create a text element in the website
+		db.run(sql, function (err) { // insert the new user's number into the database
+			if (err) throw err;
 			
-			//res.write('<br><p>----------------------------</p>');
-			//res.write('<p><b>' + welcomeText + visitorNum + '!</b></p>');
-			res.end();
-		});*/
-		/*
-    });
-}).listen(8080);*/
+			console.log('Added entry into db: ' + lastVisitorNumber + ' ,' + comment);
+		}); 
+	}
+}
