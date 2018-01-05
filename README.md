@@ -1,6 +1,4 @@
-# Fun-with-Node-js --> to be renamed and pushed to a new project
-
-Spring 2018 Capstone Design Project
+# Fun-with-Node-js
 
 
 Project developed on Windows.
@@ -13,6 +11,9 @@ These modules are the "require" statements at the top of the "internet.js" file.
 To run website:
 1. Run "start_execution.cmd" batch script. This will run the server on your machine.
 2. Right click "website.html" and open with chrome. This is the client which is also run on your machine.
+
+
+
 
 
 To setup database (Only if running code for the first time with a freshly-created database. Not required if using existing database from github repository):
